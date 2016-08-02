@@ -37,8 +37,7 @@ Revolver.settings
 initialCommands := """|import akka.actor._
                       |import akka.pattern._
                       |import akka.util._
-                      |import scala.concurrent._
-                      |import scala.concurrent.duration._""".stripMargin
+                      |import scala.concurrent._""".stripMargin
 
 publishArtifact in Test := false
 pomIncludeRepository := { _ => false }

@@ -8,9 +8,9 @@ import geotrellis.analysis.model._
 
 class StatusServiceTest extends ServiceTestBase with CirceSupport {
   "StatusService" when {
-    "GET /status/uptime" should {
-      "return uptime" in {
-        Get("/status/uptime") ~> Routes() ~> check {
+    "GET /status" should {
+      "return status" in {
+        Get("/status") ~> Routes() ~> check {
           status should be(StatusCodes.OK)
           responseAs[Status].uptime should include("milliseconds")
         }

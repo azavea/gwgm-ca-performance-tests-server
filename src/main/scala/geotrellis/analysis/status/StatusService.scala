@@ -1,4 +1,4 @@
-package geotrellis.analysis.routes
+package geotrellis.analysis.status
 
 import java.lang.management.ManagementFactory
 import akka.http.scaladsl.server.Directives._
@@ -10,7 +10,7 @@ import geotrellis.analysis.model._
 import geotrellis.analysis._
 
 object StatusService extends BaseService with System.LoggerExecutor {
-  def uptime = {
+  def status = {
     log.info("/status/uptime executed")
     complete(Status(Duration(ManagementFactory.getRuntimeMXBean.getUptime, MILLISECONDS).toString()))
   }
