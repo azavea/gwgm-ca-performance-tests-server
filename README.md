@@ -9,7 +9,7 @@ over each of these frameworks.
 
 To build, simply run `make build`. Scala source will be compiled and a
 docker image will be generated which serves this (akka-http backed)
-project on port 9090.
+project on port 7070.
 
 Testing of the scala source is best done through sbt (for fast
 iteration) with either `sbt test` (if unit tests are desired) or
