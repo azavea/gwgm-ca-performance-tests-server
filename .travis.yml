@@ -1,5 +1,7 @@
 sudo: required
-language: bash
+language: scala
+jdk:
+  - openjdk7
 services:
 - docker
 env:
