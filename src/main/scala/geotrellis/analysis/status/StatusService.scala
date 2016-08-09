@@ -6,16 +6,26 @@ import io.circe.generic.auto._
 
 import scala.concurrent.duration._
 
-import geotrellis.analysis.model._
 import geotrellis.analysis._
+import geotrellis.analysis.geomesa.connection._
+import geotrellis.analysis.geowave.connection._
 
-object StatusService extends BaseService with System.LoggerExecutor {
+object StatusService extends BaseService
+    with GeoMesaConnection
+    with GeoWaveConnection
+    with System.LoggerExecutor {
   def system = {
     log.info("/status/uptime executed")
     complete(Status(Duration(ManagementFactory.getRuntimeMXBean.getUptime, MILLISECONDS).toString()))
   }
 
-  def geomesa = ???
+  def geomesa(table: String) = {
+    log.info("/status/geomesa executed")
+    complete(gwBasicOperations.getRowCount(table))
+  }
 
-  def geowave = ???
+  def geowave(table: String) = {
+    log.info("/status/geowave executed")
+    complete(gwBasicOperations.getRowCount(table))
+  }
 }

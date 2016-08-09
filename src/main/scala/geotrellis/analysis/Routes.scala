@@ -15,16 +15,44 @@ object Routes {
     } ~
       pathPrefix("geomesa") {
         pathPrefix("status") {
-          get {
-            StatusService.geomesa
+          parameters('table) { table =>
+            get {
+              StatusService.geomesa(table)
+            }
           }
-        }
+        } ~
+          pathPrefix("sfts") {
+            pathEndOrSingleSlash {
+              get {
+                geomesa.SimpleFeatureTypes.list
+              }
+            } ~
+              pathPrefix(Segment) { sftName =>
+                get {
+                  geomesa.SimpleFeatureTypes.detail(sftName)
+                }
+              }
+          }
+      } ~
+      pathPrefix("geowave") {
+        pathPrefix("status") {
+          parameters('table) { table =>
+            get {
+              StatusService.geowave(table)
+            }
+          }
+        } ~
+          pathPrefix("sfts") {
+            pathEndOrSingleSlash {
+              get {
+                geowave.SimpleFeatureTypes.list
+              }
+            } ~
+              pathPrefix(Segment) { sftName =>
+                get {
+                  geowave.SimpleFeatureTypes.detail(sftName)
+                }
+              }
+          }
       }
-  pathPrefix("geowave") {
-    pathPrefix("status") {
-      get {
-        StatusService.geomesa
-      }
-    }
-  }
 }

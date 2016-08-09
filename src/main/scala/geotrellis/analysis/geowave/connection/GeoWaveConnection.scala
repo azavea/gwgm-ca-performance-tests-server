@@ -5,6 +5,7 @@ import net.ceedubs.ficus.Ficus
 import net.ceedubs.ficus.readers.ArbitraryTypeReader
 
 import mil.nga.giat.geowave.datastore.accumulo.operations.config._
+import mil.nga.giat.geowave.datastore.accumulo.metadata._
 import mil.nga.giat.geowave.datastore.accumulo._
 
 trait GeoWaveConnection {
@@ -26,7 +27,7 @@ trait GeoWaveConnection {
   accumuloOpts.setGeowaveNamespace(geowaveConfig.table)
   accumuloOpts.setAdditionalOptions(additionalAccumuloOpts)
 
-  private val bao = new BasicAccumuloOperations(
+  val gwBasicOperations = new BasicAccumuloOperations(
     geowaveConfig.zookeepers,
     geowaveConfig.instance,
     geowaveConfig.user,
@@ -34,5 +35,7 @@ trait GeoWaveConnection {
     geowaveConfig.table
   )
 
-  val gwDataStore = new AccumuloDataStore(bao)
+  val gwDataStore = new AccumuloDataStore(gwBasicOperations)
+
+  val gwAdapterStore = new AccumuloAdapterStore(gwBasicOperations)
 }

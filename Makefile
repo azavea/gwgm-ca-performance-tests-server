@@ -8,12 +8,10 @@ build:
 
 publish: build
 	docker push ${IMG}:latest
-	# TODO: add publishing logic which makes sense
-	#if [ "${TAG}" != "" -a "${TAG}" != "latest" ]; then docker tag ${IMG}:latest ${IMG}:${TAG} && docker push ${IMG}:${TAG}; fi
 
 test: build
 	./sbt test
-	docker run --rm -p 9090:9090 ${IMG}
+	docker run --rm -p 7070:7070 ${IMG}
 	# TODO: add tests prior to teardown
 	docker stop $(docker ps -q --filter ancestor=${IMG})
 

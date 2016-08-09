@@ -1,4 +1,4 @@
-package geotrellis.analysis.model
+package geotrellis.analysis.status
 
 case class Status(uptime: String)
 

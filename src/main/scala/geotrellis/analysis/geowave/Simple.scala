@@ -1,2 +1,0 @@
-package geotrellis.analysis.geowave
-
