@@ -8,6 +8,28 @@ resolvers += Resolver.jcenterRepo
 
 resolvers += Resolver.bintrayRepo("hseeberger", "maven")
 
+resolvers += "Locationtech Releases" at "https://repo.locationtech.org/content/repositories/geomesa-releases"
+
+resolvers += "Locationtech Releases" at "https://repo.locationtech.org/content/repositories/sfcurve-releases"
+
+resolvers += "osgeo" at "http://download.osgeo.org/webdav/geotools/"
+
+resolvers += "geosolutions" at "http://maven.geo-solutions.it/"
+
+resolvers += "boundlessgeo" at "https://boundless.artifactoryonline.com/boundless/main"
+
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-unchecked",
+  "-feature",
+  "-language:implicitConversions",
+  "-language:reflectiveCalls",
+  "-language:higherKinds",
+  "-language:postfixOps",
+  "-language:existentials",
+  "-language:experimental.macros",
+  "-feature")
+
 libraryDependencies ++= {
   val akkaV            = "2.4.8"
   val ficusV           = "1.2.4"
@@ -16,6 +38,12 @@ libraryDependencies ++= {
   val scalaMockV       = "3.2.2"
   val scalazScalaTestV = "0.3.0"
   val akkaCirceV       = "1.8.0"
+  val geomesaV         = "1.2.4"
+  val geotoolsV        = "14.3"
+  val sfcurveV         = "0.2.0"
+  val jaiV             = "1.1.3"
+  val accumuloV        = "1.7.1"
+
   Seq(
     "com.typesafe.akka" %% "akka-http-core"                    % akkaV,
     "com.typesafe.akka" %% "akka-http-experimental"            % akkaV,
@@ -24,9 +52,14 @@ libraryDependencies ++= {
     "io.circe"          %% "circe-generic"                     % circeV,
     "io.circe"          %% "circe-parser"                      % circeV,
     "de.heikoseeberger" %% "akka-http-circe"                   % akkaCirceV,
+    "org.geotools"      %  "gt-geotiff"                        % geotoolsV,
     "org.scalatest"     %% "scalatest"                         % scalaTestV  % "test",
     "org.scalamock"     %% "scalamock-scalatest-support"       % scalaMockV  % "test",
-    "com.typesafe.akka" %% "akka-http-testkit"                 % akkaV       % "test"
+    "com.typesafe.akka" %% "akka-http-testkit"                 % akkaV       % "test",
+    "org.locationtech.geomesa"  % "geomesa-accumulo-datastore" % geomesaV,
+    "org.apache.accumulo" % "accumulo-core"                    % accumuloV,
+    "javax.media"       %  "jai_core"                          % jaiV
+      from "http://download.osgeo.org/webdav/geotools/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar"
   )
 }
 

@@ -10,8 +10,12 @@ import geotrellis.analysis.model._
 import geotrellis.analysis._
 
 object StatusService extends BaseService with System.LoggerExecutor {
-  def status = {
+  def system = {
     log.info("/status/uptime executed")
     complete(Status(Duration(ManagementFactory.getRuntimeMXBean.getUptime, MILLISECONDS).toString()))
   }
+
+  def geomesa = ???
+
+  def geowave = ???
 }
