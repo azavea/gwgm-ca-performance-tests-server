@@ -18,6 +18,12 @@ resolvers += "geosolutions" at "http://maven.geo-solutions.it/"
 
 resolvers += "boundlessgeo" at "https://boundless.artifactoryonline.com/boundless/main"
 
+resolvers += "boundless" at "https://repo.boundlessgeo.com/release"
+
+resolvers += "geowave" at "http://geowave-maven.s3-website-us-east-1.amazonaws.com/snapshot"
+
+resolvers += "osgeo" at "http://download.osgeo.org/webdav/geotools/"
+
 scalacOptions ++= Seq(
   "-deprecation",
   "-unchecked",
@@ -57,9 +63,41 @@ libraryDependencies ++= {
     "org.scalamock"     %% "scalamock-scalatest-support"       % scalaMockV  % "test",
     "com.typesafe.akka" %% "akka-http-testkit"                 % akkaV       % "test",
     "org.locationtech.geomesa"  % "geomesa-accumulo-datastore" % geomesaV,
-    "org.apache.accumulo" % "accumulo-core"                    % accumuloV,
     "javax.media"       %  "jai_core"                          % jaiV
-      from "http://download.osgeo.org/webdav/geotools/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar"
+      from "http://download.osgeo.org/webdav/geotools/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar",
+    "org.apache.accumulo" % "accumulo-core"                    % accumuloV
+      exclude("org.jboss.netty", "netty")
+      exclude("org.apache.hadoop", "hadoop-client"),
+    "mil.nga.giat" % "geowave-adapter-raster" % "0.9.2-SNAPSHOT"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+        ExclusionRule(organization = "javax.servlet")),
+    "mil.nga.giat" % "geowave-adapter-vector" % "0.9.2-SNAPSHOT"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+        ExclusionRule(organization = "javax.servlet")),
+    "mil.nga.giat" % "geowave-core-store" % "0.9.2-SNAPSHOT"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+          ExclusionRule(organization = "javax.servlet")),
+    "mil.nga.giat" % "geowave-datastore-accumulo" % "0.9.2-SNAPSHOT"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+        ExclusionRule(organization = "javax.servlet")),
+    "org.geoserver" % "gs-wms" % "2.8.2"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+        ExclusionRule(organization = "javax.servlet")),
+    "org.geotools" % "gt-coverage" % geotoolsV % "provided"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+        ExclusionRule(organization = "javax.servlet")),
+    "org.geotools" % "gt-epsg-hsql" % geotoolsV % "provided"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+        ExclusionRule(organization = "javax.servlet")),
+    "org.geotools" % "gt-geotiff" % geotoolsV % "provided"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+        ExclusionRule(organization = "javax.servlet")),
+    "org.geotools" % "gt-main" % geotoolsV % "provided"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+        ExclusionRule(organization = "javax.servlet")),
+    "org.geotools" % "gt-referencing" % geotoolsV % "provided"
+      excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
+        ExclusionRule(organization = "javax.servlet"))
   )
 }
 

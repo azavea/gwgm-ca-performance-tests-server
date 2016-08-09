@@ -15,5 +15,5 @@ trait GeoMesaConnection {
   private val config = ConfigFactory.load()
   protected val geomesaConfig = config.as[GeoMesaConnectionConfig]("geomesa")
 
-  val datastore = DataStoreFinder.getDataStore(geomesaConfig.toMap).asInstanceOf[AccumuloDataStore]
+  val gmDataStore = DataStoreFinder.getDataStore(geomesaConfig.toMap).asInstanceOf[AccumuloDataStore]
 }
