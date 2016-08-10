@@ -8,51 +8,53 @@ object Routes {
   def apply() =
     pathPrefix("system") {
       pathPrefix("status") {
-        get {
-          StatusService.system
+        pathEndOrSingleSlash {
+          get {
+            StatusService.system
+          }
         }
       }
     } ~
-      pathPrefix("geomesa") {
-        pathPrefix("status") {
-          parameters('table) { table =>
-            get {
-              StatusService.geomesa(table)
-            }
+    pathPrefix("geomesa") {
+      pathPrefix("status") {
+        parameters('table) { table =>
+          get {
+            StatusService.geomesa(table)
           }
-        } ~
-          pathPrefix("sfts") {
-            pathEndOrSingleSlash {
-              get {
-                geomesa.SimpleFeatureTypes.list
-              }
-            } ~
-              pathPrefix(Segment) { sftName =>
-                get {
-                  geomesa.SimpleFeatureTypes.detail(sftName)
-                }
-              }
-          }
+        }
       } ~
-      pathPrefix("geowave") {
-        pathPrefix("status") {
-          parameters('table) { table =>
+        pathPrefix("sfts") {
+          pathEndOrSingleSlash {
             get {
-              StatusService.geowave(table)
+              geomesa.SimpleFeatureTypes.list
+            }
+          } ~
+          pathPrefix(Segment) { sftName =>
+            get {
+              geomesa.SimpleFeatureTypes.detail(sftName)
             }
           }
-        } ~
-          pathPrefix("sfts") {
-            pathEndOrSingleSlash {
-              get {
-                geowave.SimpleFeatureTypes.list
-              }
-            } ~
-              pathPrefix(Segment) { sftName =>
-                get {
-                  geowave.SimpleFeatureTypes.detail(sftName)
-                }
-              }
+        }
+    } ~
+    pathPrefix("geowave") {
+      pathPrefix("status") {
+        parameters('table) { table =>
+          get {
+            StatusService.geowave(table)
           }
+        }
+      } ~
+      pathPrefix("sfts") {
+        pathEndOrSingleSlash {
+          get {
+            geowave.SimpleFeatureTypes.list
+          }
+        } ~
+        pathPrefix(Segment) { sftName =>
+          get {
+            geowave.SimpleFeatureTypes.detail(sftName)
+          }
+        }
       }
+    }
 }

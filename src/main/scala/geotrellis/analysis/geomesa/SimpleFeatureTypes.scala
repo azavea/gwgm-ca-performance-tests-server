@@ -18,6 +18,5 @@ object SimpleFeatureTypes extends BaseService
       .getAttributeDescriptors
       .map { attr => attr.getLocalName() }
   }
-
 }
 
