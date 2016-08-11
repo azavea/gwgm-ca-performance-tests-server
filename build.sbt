@@ -102,7 +102,6 @@ libraryDependencies ++= {
 }
 
 lazy val root = project.in(file("."))
-Defaults.itSettings
 Revolver.settings
 
 initialCommands := """|import akka.actor._
