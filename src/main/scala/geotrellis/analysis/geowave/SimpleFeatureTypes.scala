@@ -10,15 +10,18 @@ import connection._
 
 object SimpleFeatureTypes extends BaseService
     with GeoWaveConnection
-    with System.LoggerExecutor {
+    with AkkaSystem.LoggerExecutor {
   import scala.collection.JavaConversions._
 
-  def list = complete {
-    gwAdapterStore
-      .getAdapters()
-      .toList.map {
-        _.asInstanceOf[FeatureDataAdapter].getType.getTypeName
-      }
+  def list = {
+    log.info("/geowave/sfts executed")
+    complete {
+      gwAdapterStore
+        .getAdapters()
+        .toList.map {
+          _.asInstanceOf[FeatureDataAdapter].getType.getTypeName
+        }
+    }
   }
 
   def detail(typeName: String) = ???

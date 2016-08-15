@@ -7,7 +7,7 @@ import net.ceedubs.ficus.readers.ArbitraryTypeReader
 import org.geotools.data.DataStoreFinder
 import org.locationtech.geomesa.accumulo.data.AccumuloDataStore
 
-trait GeoMesaConnection {
+object GeoMesaConnection {
   import Ficus._
   import ArbitraryTypeReader._
   import scala.collection.JavaConversions._
@@ -15,5 +15,11 @@ trait GeoMesaConnection {
   private val config = ConfigFactory.load()
   protected val geomesaConfig = config.as[GeoMesaConnectionConfig]("geomesa")
 
-  val gmDataStore = DataStoreFinder.getDataStore(geomesaConfig.toMap).asInstanceOf[AccumuloDataStore]
+  def dataStore(tableName: String): AccumuloDataStore = {
+    val dsParams = geomesaConfig.toParamsMap(tableName)
+
+    DataStoreFinder
+      .getDataStore(dsParams)
+      .asInstanceOf[AccumuloDataStore]
+  }
 }

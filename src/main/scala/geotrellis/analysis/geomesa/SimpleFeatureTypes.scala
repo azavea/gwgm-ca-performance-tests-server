@@ -6,15 +6,20 @@ import io.circe.generic.auto._
 import geotrellis.analysis._
 import connection._
 
-object SimpleFeatureTypes extends BaseService
-    with GeoMesaConnection
-    with System.LoggerExecutor {
+import org.geotools.data.DataStoreFinder
+import org.locationtech.geomesa.accumulo.data.AccumuloDataStore
+
+object SimpleFeatureTypes extends BaseService with AkkaSystem.LoggerExecutor {
   import scala.collection.JavaConversions._
 
-  def list = complete(gmDataStore.getTypeNames)
+  def list(tableName: String) = complete {
+    val ds = GeoMesaConnection.dataStore(tableName)
+    ds.getTypeNames().toList
+  }
 
-  def detail(typeName: String) = complete {
-    gmDataStore.getSchema(typeName)
+  def detail(tableName: String, typeName: String) = complete {
+    val ds = GeoMesaConnection.dataStore(tableName)
+    ds.getSchema(typeName)
       .getAttributeDescriptors
       .map { attr => attr.getLocalName() }
   }
