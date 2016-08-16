@@ -1,9 +1,12 @@
 IMG  := comparative-analysis-bastion
 
-compile:
+clean:
+	rm -rf target/scala-2.11/comparative-analysis-bastion-assembly-0.0.1.jar
+
+assemble:
 	./sbt assembly
 
-build:
+build: clean assemble
 	docker build -t ${IMG}:latest	.
 
 publish: build
