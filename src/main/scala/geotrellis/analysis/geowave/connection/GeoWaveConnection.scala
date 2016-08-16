@@ -8,7 +8,7 @@ import mil.nga.giat.geowave.datastore.accumulo.operations.config._
 import mil.nga.giat.geowave.datastore.accumulo.metadata._
 import mil.nga.giat.geowave.datastore.accumulo._
 
-trait GeoWaveConnection {
+object GeoWaveConnection {
   import Ficus._
   import ArbitraryTypeReader._
   import scala.collection.JavaConversions._
@@ -19,23 +19,28 @@ trait GeoWaveConnection {
   private val additionalAccumuloOpts = new AccumuloOptions
   additionalAccumuloOpts.setUseAltIndex(true)
 
-  private val accumuloOpts = new AccumuloRequiredOptions
-  accumuloOpts.setZookeeper(geowaveConfig.zookeepers)
-  accumuloOpts.setInstance(geowaveConfig.instance)
-  accumuloOpts.setUser(geowaveConfig.user)
-  accumuloOpts.setPassword(geowaveConfig.password)
-  accumuloOpts.setGeowaveNamespace(geowaveConfig.table)
-  accumuloOpts.setAdditionalOptions(additionalAccumuloOpts)
+  def accumuloOpts(tableName: String) = {
+    val opts = new AccumuloRequiredOptions
+    opts.setZookeeper(geowaveConfig.zookeepers)
+    opts.setInstance(geowaveConfig.instance)
+    opts.setUser(geowaveConfig.user)
+    opts.setPassword(geowaveConfig.password)
+    opts.setGeowaveNamespace(tableName)
+    opts.setAdditionalOptions(additionalAccumuloOpts)
+  }
 
-  val gwBasicOperations = new BasicAccumuloOperations(
-    geowaveConfig.zookeepers,
-    geowaveConfig.instance,
-    geowaveConfig.user,
-    geowaveConfig.password,
-    geowaveConfig.table
-  )
+  def basicOperations(tableName: String) =
+    new BasicAccumuloOperations(
+      geowaveConfig.zookeepers,
+      geowaveConfig.instance,
+      geowaveConfig.user,
+      geowaveConfig.password,
+      tableName
+    )
 
-  val gwDataStore = new AccumuloDataStore(gwBasicOperations)
+  def dataStore(tableName: String) =
+    new AccumuloDataStore(basicOperations(tableName))
 
-  val gwAdapterStore = new AccumuloAdapterStore(gwBasicOperations)
+  def adapterStore(tableName: String) =
+    new AccumuloAdapterStore(basicOperations(tableName))
 }

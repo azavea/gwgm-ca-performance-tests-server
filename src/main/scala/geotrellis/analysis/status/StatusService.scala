@@ -34,8 +34,9 @@ object StatusService extends BaseService with AkkaSystem.LoggerExecutor {
   }
 
   /** This endpoint will return a count of all simple feature types found on a given catalog */
-  //def geowave(table: String) = {
-  //  log.info("/status/geowave executed")
-  //  complete(gwBasicOperations.getRowCount(table))
-  //}
+  def geowave(tableName: String) = complete {
+    val gwBasicOperations = GeoWaveConnection.basicOperations(tableName)
+    log.info(s"/geowave/${tableName}/status executed")
+    gwBasicOperations.getRowCount(tableName)
+  }
 }

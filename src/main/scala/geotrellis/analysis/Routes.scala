@@ -42,29 +42,29 @@ object Routes {
       }
     }
 
-  //val geowaveRoutes =
-  //  pathPrefix("geowave") {
-  //    pathPrefix("status") {
-  //      parameters('table) { table =>
-  //        get {
-  //          StatusService.geowave(table)
-  //        }
-  //      }
-  //    } ~
-  //    pathPrefix("sfts") {
-  //      pathEndOrSingleSlash {
-  //        get {
-  //          geowave.SimpleFeatureTypes.list
-  //        }
-  //      } ~
-  //      pathPrefix(Segment) { sftName =>
-  //        get {
-  //          geowave.SimpleFeatureTypes.detail(sftName)
-  //        }
-  //      }
-  //    }
-  //  }
+  val geowaveRoutes =
+    pathPrefix("geowave") {
+      pathPrefix(Segment) { tableName =>
+        pathPrefix("status") {
+          get {
+            StatusService.geowave(tableName)
+          }
+        } ~
+        pathPrefix("sfts") {
+          pathEndOrSingleSlash {
+            get {
+              geowave.SimpleFeatureTypes.list(tableName)
+            }
+          } ~
+          pathPrefix(Segment) { sftName =>
+            get {
+              geowave.SimpleFeatureTypes.detail(tableName, sftName)
+            }
+          }
+        }
+      }
+    }
 
   def apply() =
-    systemRoutes ~ geomesaRoutes
+    systemRoutes ~ geomesaRoutes ~ geowaveRoutes
 }
