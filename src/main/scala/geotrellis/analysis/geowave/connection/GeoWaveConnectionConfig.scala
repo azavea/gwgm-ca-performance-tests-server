@@ -5,17 +5,19 @@ import net.ceedubs.ficus.Ficus
 import net.ceedubs.ficus.readers.ArbitraryTypeReader
 
 case class GeoWaveConnectionConfig(
-    user: String,
-    password: String,
-    instance: String,
-    zookeepers: String,
-    table: String
+  user: String,
+  password: String,
+  instance: String,
+  zookeepers: String
 ) {
-  def toMap = Map(
-    "user" -> this.user,
-    "password" -> this.password,
-    "instance" -> this.instance,
-    "zookeepers" -> this.zookeepers,
-    "table" -> this.table
-  )
+  def toParamsMap(gwNamespace: String) = {
+    println(s"Creating GeoWave connection with: table->${gwNamespace}, user->${this.user}, password->${this.password}, instance->${this.instance}, and zk->${this.zookeepers}")
+    Map(
+      "user" -> this.user,
+      "password" -> this.password,
+      "instanceId" -> this.instance,
+      "zookeepers" -> this.zookeepers,
+      "tableName" -> gwNamespace
+    )
+  }
 }

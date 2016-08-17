@@ -34,9 +34,9 @@ object Routes {
             }
           } ~
           pathPrefix(Segment) { sftName =>
-           get {
-             geomesa.SimpleFeatureTypes.detail(tableName, sftName)
-           }
+            get {
+              geomesa.SimpleFeatureTypes.detail(tableName, sftName)
+            }
           }
         }
       }
