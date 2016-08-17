@@ -1,7 +1,7 @@
 package geotrellis.analysis.geomesa
 
-import connection._
 import geotrellis.analysis._
+import geotrellis.analysis.geomesa.connection._
 
 import org.geotools.data.DataStoreFinder
 import org.locationtech.geomesa.accumulo.data.AccumuloDataStore
