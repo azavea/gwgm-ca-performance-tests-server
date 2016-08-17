@@ -2,39 +2,33 @@ name          := "comparative-analysis-bastion"
 organization  := "geotrellis"
 version       := "0.0.1"
 scalaVersion  := "2.11.8"
-scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8")
 
-resolvers += Resolver.jcenterRepo
-
-resolvers += Resolver.bintrayRepo("hseeberger", "maven")
-
-resolvers += "Locationtech Releases" at "https://repo.locationtech.org/content/repositories/geomesa-releases"
-
-resolvers += "Locationtech Releases" at "https://repo.locationtech.org/content/repositories/sfcurve-releases"
-
-resolvers += "osgeo" at "http://download.osgeo.org/webdav/geotools/"
-
-resolvers += "geosolutions" at "http://maven.geo-solutions.it/"
-
-resolvers += "boundlessgeo" at "https://boundless.artifactoryonline.com/boundless/main"
-
-resolvers += "boundless" at "https://repo.boundlessgeo.com/release"
-
-resolvers += "geowave" at "http://geowave-maven.s3-website-us-east-1.amazonaws.com/snapshot"
-
-resolvers += "osgeo" at "http://download.osgeo.org/webdav/geotools/"
+resolvers ++= Seq(
+  "boundless" at "https://repo.boundlessgeo.com/release",
+  "boundlessgeo" at "https://boundless.artifactoryonline.com/boundless/main",
+  "geomesa releases" at "https://repo.locationtech.org/content/repositories/releases/",
+  "geomesa snapshots" at "https://repo.locationtech.org/content/repositories/snapshots/",
+  "geosolutions" at "http://maven.geo-solutions.it/",
+  "geowave release" at "http://geowave-maven.s3-website-us-east-1.amazonaws.com/release",
+  "geowave snapshot" at "http://geowave-maven.s3-website-us-east-1.amazonaws.com/snapshot",
+  "osgeo" at "http://download.osgeo.org/webdav/geotools/",
+  "sfcurve releases" at "https://repo.locationtech.org/content/repositories/sfcurve-releases",
+  Resolver.bintrayRepo("hseeberger", "maven"),
+  Resolver.jcenterRepo
+)
 
 scalacOptions ++= Seq(
   "-deprecation",
-  "-unchecked",
+  "-encoding", "utf8",
   "-feature",
-  "-language:implicitConversions",
-  "-language:reflectiveCalls",
-  "-language:higherKinds",
-  "-language:postfixOps",
   "-language:existentials",
   "-language:experimental.macros",
-  "-feature")
+  "-language:higherKinds",
+  "-language:implicitConversions",
+  "-language:postfixOps",
+  "-language:reflectiveCalls",
+  "-unchecked"
+)
 
 libraryDependencies ++= {
   val akkaV            = "2.4.8"
@@ -45,6 +39,7 @@ libraryDependencies ++= {
   val scalazScalaTestV = "0.3.0"
   val akkaCirceV       = "1.8.0"
   val geomesaV         = "1.2.5"
+  val geowaveV         = "0.9.3-SNAPSHOT"
   val geotoolsV        = "14.3"
   val sfcurveV         = "0.2.0"
   val jaiV             = "1.1.3"
@@ -68,16 +63,16 @@ libraryDependencies ++= {
     "org.apache.accumulo" % "accumulo-core"                    % accumuloV
       exclude("org.jboss.netty", "netty")
       exclude("org.apache.hadoop", "hadoop-client"),
-    "mil.nga.giat" % "geowave-adapter-raster" % "0.9.2-SNAPSHOT"
+    "mil.nga.giat" % "geowave-adapter-raster" % geowaveV
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
         ExclusionRule(organization = "javax.servlet")),
-    "mil.nga.giat" % "geowave-adapter-vector" % "0.9.2-SNAPSHOT"
+    "mil.nga.giat" % "geowave-adapter-vector" % geowaveV
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
         ExclusionRule(organization = "javax.servlet")),
-    "mil.nga.giat" % "geowave-core-store" % "0.9.2-SNAPSHOT"
+    "mil.nga.giat" % "geowave-core-store" % geowaveV
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
           ExclusionRule(organization = "javax.servlet")),
-    "mil.nga.giat" % "geowave-datastore-accumulo" % "0.9.2-SNAPSHOT"
+    "mil.nga.giat" % "geowave-datastore-accumulo" % geowaveV
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
         ExclusionRule(organization = "javax.servlet")),
     "org.geoserver" % "gs-wms" % "2.8.2"
@@ -112,7 +107,7 @@ initialCommands := """|import akka.actor._
 publishArtifact in Test := false
 pomIncludeRepository := { _ => false }
 
-// When creating fat jar, remote some files with
+// When creating fat jar, remove some files with
 // bad signatures and resolve conflicts by taking the first
 // versions of shared packaged types.
 assemblyMergeStrategy in assembly := {
