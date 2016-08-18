@@ -13,12 +13,8 @@ import org.opengis.filter.Filter
 import akka.http.scaladsl.server.Directives._
 import io.circe.generic.auto._
 
-import scala.concurrent.Future
 
-
-object Query
-    extends BaseService
-    with AkkaSystem.LoggerExecutor {
+object Query {
 
   /**
     * Perform various types of queries:
@@ -73,55 +69,6 @@ object Query
     }
 
     n // return value
-  }
-
-  /**
-    * Perform a spatial range query, return the amount of time and the
-    * number of records.
-    */
-  def spatialRangeQuery(
-    tableName: String, typeName: String,
-    where: String, xmin: Double, ymin: Double, xmax: Double, ymax: Double
-  ) = complete {
-    Future {
-      val before = System.currentTimeMillis
-      val n =
-        query(
-          tableName, typeName,
-          where, List(xmin, ymin), Some(List(xmax, ymax)),
-          None, None, None
-        )
-      val after = System.currentTimeMillis
-
-      Map[String, Long](
-        "time" -> (after - before),
-        "results" -> n
-      )
-    }
-  }
-
-  /**
-    * Perform a spatio-temporal range query, return the amount of time
-    * and the number of records.
-    */
-  def spatioTemporalRangeQuery(
-    tableName: String, typeName: String,
-    where: String, xmin: Double, ymin: Double, xmax: Double, ymax: Double,
-    when: String, fromTime: String, toTime: String
-  ) = complete {
-    val before = System.currentTimeMillis
-    val n =
-      query(
-        tableName, typeName,
-        where, List(xmin, ymin), Some(List(xmax, ymax)),
-        Some(when), Some(fromTime), Some(toTime)
-      )
-    val after = System.currentTimeMillis
-
-    Map[String, Long](
-      "time" -> (after - before),
-      "results" -> n
-    )
   }
 
 }

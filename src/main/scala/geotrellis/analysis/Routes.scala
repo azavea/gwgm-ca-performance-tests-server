@@ -39,30 +39,7 @@ object Routes {
             }
           }
         } ~
-        pathPrefix("rangequery") {
-          parameters('xmin, 'ymin, 'xmax, 'ymax, 'from ?, 'to ?) { (_xmin, _ymin, _xmax, _ymax, _to, _from) =>
-            val xmin = _xmin.toDouble
-            val ymin = _ymin.toDouble
-            val xmax = _xmax.toDouble
-            val ymax = _ymax.toDouble
-
-            (_from, _to) match {
-              case (Some(from), Some(to)) =>
-                geomesa.Query.spatioTemporalRangeQuery(
-                  tableName,
-                  "CommonPointSimpleFeatureType",
-                  "where", xmin, ymin, xmax, ymax,
-                  "when", from, to
-                )
-              case _ =>
-                geomesa.Query.spatialRangeQuery(
-                  tableName,
-                  "CommonPointSimpleFeatureType",
-                  "where", xmin, ymin, xmax, ymax
-                )
-            }
-          }
-        }
+        Query.rangeQuery(geomesa.Query.query, tableName)
       }
     }
 
@@ -85,7 +62,8 @@ object Routes {
               geowave.SimpleFeatureTypes.detail(tableName, sftName)
             }
           }
-        }
+        } ~
+        Query.rangeQuery(geowave.Query.query, tableName)
       }
     }
 
