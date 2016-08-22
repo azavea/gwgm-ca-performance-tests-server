@@ -17,10 +17,18 @@ iteration) with either `sbt test` (if unit tests are desired) or
 is necessary). `make test` will run `sbt test` and verify that the
 docker container is properly constructed and serving data.
 
+### Running ###
+
+The code can be run locally as follows.
+First execute this command to start a container:
 ```
-docker run -it --net=desktop_default --rm -p 7070:7070 \
-       -e GM_USER=root -e GM_PASS=GisPwd -e GM_INSTANCE=geomesa -e GM_ZK=zookeeper \
-       -e GW_USER=root -e GW_PASS=GisPwd -e GW_INSTANCE=geowave -e GW_ZK=zookeeper \
-       -v $(pwd):/code:rw -v $HOME/.ivy2:/root/.ivy2:rw -v $HOME/.sbt:/root/.sbt:rw openjdk:8-jdk \
-       bash
+docker run -it --net=xxx --rm -p 7070:7070 \
+   -e GM_USER=root -e GM_PASS=GisPwd -e GM_INSTANCE=geomesa -e GM_ZK=zookeeper \
+   -e GW_USER=root -e GW_PASS=GisPwd -e GW_INSTANCE=geowave -e GW_ZK=zookeeper \
+   -v $(pwd):/code:rw \
+   -v $HOME/.ivy2:/root/.ivy2:rw \
+   -v $HOME/.m2:/root/.m2:rw \
+   -v $HOME/.sbt:/root/.sbt:rw openjdk:8-jdk
 ```
+
+Then within the container, navidate to the `/code` directory and run `./sbt '~reStart'`.
