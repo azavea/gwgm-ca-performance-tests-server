@@ -1,16 +1,20 @@
 package geotrellis.analysis.geomesa
 
-import akka.http.scaladsl.server.Directives._
-import io.circe.generic.auto._
-
 import geotrellis.analysis._
-import connection._
+import geotrellis.analysis.geomesa.connection._
 
 import org.geotools.data.DataStoreFinder
 import org.locationtech.geomesa.accumulo.data.AccumuloDataStore
 
-object SimpleFeatureTypes extends BaseService with AkkaSystem.LoggerExecutor {
-  import scala.collection.JavaConversions._
+import akka.http.scaladsl.server.Directives._
+import io.circe.generic.auto._
+
+import scala.collection.JavaConversions._
+
+
+object SimpleFeatureTypes
+    extends BaseService
+    with AkkaSystem.LoggerExecutor {
 
   def list(tableName: String) = complete {
     val ds = GeoMesaConnection.dataStore(tableName)

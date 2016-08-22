@@ -1,6 +1,6 @@
 FROM java:8
 
-MAINTAINER Nathan Zimmerman, npzimmerman@gmail.com
+MAINTAINER Nathan Zimmerman <npzimmerman@gmail.com>
 
 EXPOSE 7070
 

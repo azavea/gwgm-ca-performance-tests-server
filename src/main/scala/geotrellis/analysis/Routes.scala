@@ -8,6 +8,9 @@ import geotrellis.analysis.geowave.connection._
 
 object Routes {
 
+  val queryRoutes =
+    Query.queryBoth(geowave.Query.query, geomesa.Query.query)
+
   val systemRoutes =
     pathPrefix("system") {
       pathPrefix("status") {
@@ -34,11 +37,12 @@ object Routes {
             }
           } ~
           pathPrefix(Segment) { sftName =>
-           get {
-             geomesa.SimpleFeatureTypes.detail(tableName, sftName)
-           }
+            get {
+              geomesa.SimpleFeatureTypes.detail(tableName, sftName)
+            }
           }
-        }
+        } ~
+        Query.rangeQuery(geomesa.Query.query, tableName)
       }
     }
 
@@ -61,10 +65,11 @@ object Routes {
               geowave.SimpleFeatureTypes.detail(tableName, sftName)
             }
           }
-        }
+        } ~
+        Query.rangeQuery(geowave.Query.query, tableName)
       }
     }
 
   def apply() =
-    systemRoutes ~ geomesaRoutes ~ geowaveRoutes
+    systemRoutes ~ geomesaRoutes ~ geowaveRoutes ~ queryRoutes
 }

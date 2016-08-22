@@ -1,17 +1,18 @@
 package geotrellis.analysis.geowave.connection
 
 import com.typesafe.config.ConfigFactory
+import mil.nga.giat.geowave.datastore.accumulo._
+import mil.nga.giat.geowave.datastore.accumulo.metadata._
+import mil.nga.giat.geowave.datastore.accumulo.operations.config._
 import net.ceedubs.ficus.Ficus
 import net.ceedubs.ficus.readers.ArbitraryTypeReader
 
-import mil.nga.giat.geowave.datastore.accumulo.operations.config._
-import mil.nga.giat.geowave.datastore.accumulo.metadata._
-import mil.nga.giat.geowave.datastore.accumulo._
+import scala.collection.JavaConversions._
+
 
 object GeoWaveConnection {
   import Ficus._
   import ArbitraryTypeReader._
-  import scala.collection.JavaConversions._
 
   private val config = ConfigFactory.load()
   protected val geowaveConfig = config.as[GeoWaveConnectionConfig]("geowave")
@@ -19,28 +20,28 @@ object GeoWaveConnection {
   private val additionalAccumuloOpts = new AccumuloOptions
   additionalAccumuloOpts.setUseAltIndex(true)
 
-  def accumuloOpts(tableName: String) = {
+  def accumuloOpts(gwNamespace: String) = {
     val opts = new AccumuloRequiredOptions
     opts.setZookeeper(geowaveConfig.zookeepers)
     opts.setInstance(geowaveConfig.instance)
     opts.setUser(geowaveConfig.user)
     opts.setPassword(geowaveConfig.password)
-    opts.setGeowaveNamespace(tableName)
+    opts.setGeowaveNamespace(gwNamespace)
     opts.setAdditionalOptions(additionalAccumuloOpts)
   }
 
-  def basicOperations(tableName: String) =
+  def basicOperations(gwNamespace: String) =
     new BasicAccumuloOperations(
       geowaveConfig.zookeepers,
       geowaveConfig.instance,
       geowaveConfig.user,
       geowaveConfig.password,
-      tableName
+      gwNamespace
     )
 
-  def dataStore(tableName: String) =
-    new AccumuloDataStore(basicOperations(tableName))
+  def dataStore(gwNamespace: String) =
+    new AccumuloDataStore(basicOperations(gwNamespace))
 
-  def adapterStore(tableName: String) =
-    new AccumuloAdapterStore(basicOperations(tableName))
+  def adapterStore(gwNamespace: String) =
+    new AccumuloAdapterStore(basicOperations(gwNamespace))
 }

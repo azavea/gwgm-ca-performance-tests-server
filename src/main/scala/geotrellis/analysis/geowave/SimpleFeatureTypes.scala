@@ -1,12 +1,14 @@
 package geotrellis.analysis.geowave
 
+import geotrellis.analysis._
+import geotrellis.analysis.geowave.connection._
+
 import mil.nga.giat.geowave.adapter.vector.FeatureDataAdapter
 import org.opengis.feature.simple._
+
 import akka.http.scaladsl.server.Directives._
 import io.circe.generic.auto._
 
-import geotrellis.analysis.geowave.connection._
-import geotrellis.analysis._
 
 object SimpleFeatureTypes extends BaseService with AkkaSystem.LoggerExecutor {
   import scala.collection.JavaConversions._
