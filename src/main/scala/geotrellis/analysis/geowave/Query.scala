@@ -46,7 +46,7 @@ object Query {
         val coordinate = new Coordinate(lowerLeft(0), lowerLeft(1))
         geometryFactory.createPoint(coordinate)
     }
-    println(s"WAVE $geom")
+    // println(s"WAVE $geom")
 
     /* Create the Query */
     val query: GeoWaveQuery = (when, fromTime, toTime) match {
@@ -64,7 +64,8 @@ object Query {
     var n = 0
     val itr = ds.query(queryOptions, query)
     while (itr.hasNext) {
-      val f: SimpleFeature = itr.next
+      val feature: SimpleFeature = itr.next
+      // println(s"WAVE ${feature}")
       n += 1
     }
     itr.close; n // return value

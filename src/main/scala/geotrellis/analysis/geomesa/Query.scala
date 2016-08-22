@@ -53,7 +53,7 @@ object Query {
         s"AND ($when TEQUALS $fromTime)"
       case _ => ""
     }
-    println(s"MESA ${spatial + temporal}")
+    // println(s"MESA ${spatial + temporal}")
 
     val filter = CQL.toFilter(spatial + temporal)
     val query = new GeoToolsQuery(typeName, filter)
@@ -63,6 +63,7 @@ object Query {
     var n = 0
     while (itr.hasNext) {
       val feature = itr.next
+      // println(s"MESA ${feature.getProperties}")
       n += 1
     }
     n // return value
