@@ -10,9 +10,6 @@ import org.geotools.filter.text.cql2.CQLException
 import org.locationtech.geomesa.accumulo.data.AccumuloDataStore
 import org.opengis.filter.Filter
 
-import akka.http.scaladsl.server.Directives._
-import io.circe.generic.auto._
-
 
 object Query {
 
@@ -56,6 +53,7 @@ object Query {
         s"AND ($when TEQUALS $fromTime)"
       case _ => ""
     }
+    println(s"MESA ${spatial + temporal}")
 
     val filter = CQL.toFilter(spatial + temporal)
     val query = new GeoToolsQuery(typeName, filter)
@@ -64,10 +62,9 @@ object Query {
 
     var n = 0
     while (itr.hasNext) {
-      itr.next
+      val feature = itr.next
       n += 1
     }
-
     n // return value
   }
 

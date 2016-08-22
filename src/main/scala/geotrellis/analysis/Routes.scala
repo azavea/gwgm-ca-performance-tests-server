@@ -8,6 +8,9 @@ import geotrellis.analysis.geowave.connection._
 
 object Routes {
 
+  val queryRoutes =
+    Query.queryBoth(geowave.Query.query, geomesa.Query.query)
+
   val systemRoutes =
     pathPrefix("system") {
       pathPrefix("status") {
@@ -68,5 +71,5 @@ object Routes {
     }
 
   def apply() =
-    systemRoutes ~ geomesaRoutes ~ geowaveRoutes
+    systemRoutes ~ geomesaRoutes ~ geowaveRoutes ~ queryRoutes
 }

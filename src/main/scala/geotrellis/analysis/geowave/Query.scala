@@ -10,15 +10,10 @@ import mil.nga.giat.geowave.core.geotime.store.query._
 import mil.nga.giat.geowave.core.store.query.{Query => GeoWaveQuery, QueryOptions}
 import org.opengis.feature.simple._
 
-import akka.http.scaladsl.server.Directives._
-import io.circe.generic.auto._
-
 import scala.collection.JavaConversions._
 
 
-object Query
-    extends BaseService
-    with AkkaSystem.LoggerExecutor {
+object Query {
 
   val dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   val geometryFactory = new GeometryFactory
@@ -45,12 +40,13 @@ object Query
     /* Get the Query Geometry, either a box or a point */
     val geom = upperRight match {
       case Some(upperRight) =>
-        val envelope = new Envelope(lowerLeft(0), upperRight(0), lowerLeft(1), upperRight(1))
+        val envelope = new Envelope(upperRight(0), lowerLeft(0), upperRight(1), lowerLeft(1))
         geometryFactory.toGeometry(envelope)
       case _ =>
         val coordinate = new Coordinate(lowerLeft(0), lowerLeft(1))
         geometryFactory.createPoint(coordinate)
     }
+    println(s"WAVE $geom")
 
     /* Create the Query */
     val query: GeoWaveQuery = (when, fromTime, toTime) match {
@@ -65,7 +61,13 @@ object Query
         new SpatialQuery(geom)
     }
 
-    ds.query(queryOptions, query).length
+    var n = 0
+    val itr = ds.query(queryOptions, query)
+    while (itr.hasNext) {
+      val f: SimpleFeature = itr.next
+      n += 1
+    }
+    itr.close; n // return value
   }
 
 }
