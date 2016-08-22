@@ -6,7 +6,7 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.server.Directives
 
-object System {
+object AkkaSystem {
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
 
@@ -16,8 +16,8 @@ object System {
   }
 }
 
-object Main extends App with Config with System.LoggerExecutor {
-  import System._
+object Main extends App with Config with AkkaSystem.LoggerExecutor {
+  import AkkaSystem._
   import Directives._
 
   Http().bindAndHandle(Routes(), httpConfig.interface, httpConfig.port)
