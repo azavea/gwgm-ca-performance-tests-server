@@ -6,6 +6,8 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.server.Directives
 
+import geotrellis.analysis.exception._
+
 object AkkaSystem {
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
@@ -19,6 +21,8 @@ object AkkaSystem {
 object Main extends App with Config with AkkaSystem.LoggerExecutor {
   import AkkaSystem._
   import Directives._
+
+  implicit def stackTraceHandler = ExceptionHandling.stackTraceHandler
 
   Http().bindAndHandle(Routes(), httpConfig.interface, httpConfig.port)
 }
