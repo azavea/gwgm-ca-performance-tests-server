@@ -1,0 +1,16 @@
+version: '2'
+services:
+    bastion-server:
+      image: quay.io/geotrellis/comparative-analysis-bastion:latest
+      environment:
+        GW_ZK: zookeeper
+        GW_USER: root
+        GW_PASS: GisPwd
+        GW_INSTANCE: geowave
+        GM_ZK: zookeeper
+        GM_USER: root
+        GM_PASS: GisPwd
+        GM_INSTANCE: geomesa
+      ports:
+        - 7070:7070
+
