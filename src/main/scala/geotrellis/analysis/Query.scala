@@ -21,6 +21,7 @@ object Query
     Option[String]       // end time
   ) => Int
 
+
   /**
     * Perform a spatial range query, return the amount of time and the
     * number of records.
@@ -70,9 +71,12 @@ object Query
     )
   }
 
+  /**
+    * Query both GeoWave and GeoMesa simultaneously.
+    */
   def queryBoth(waveQuery: QueryFn, mesaQuery: QueryFn) =
     pathPrefix("rangequeries") {
-      parameters('width, 'n, 'seed, 'mesaTable, 'waveTable, 'sftName, 'from ?, 'to ?) {
+      parameters('width, 'n, 'seed, 'mesaTable ?, 'waveTable ?, 'sftName, 'from ?, 'to ?) {
         (width, n, seed, mesaTable, waveTable, sftName, _from, _to) =>
         rng.setSeed(seed.toLong)
         complete {
@@ -85,44 +89,47 @@ object Query
                 val ymax = math.min(90,   ymin + width.toDouble)
 
                 val info = Map[String, Long](
-                  "i" -> i,
-                  "xmin" -> (xmin * 1000000).toLong,
-                  "ymin" -> (ymin * 1000000).toLong,
-                  "xmax" -> (xmax * 1000000).toLong,
-                  "ymax" -> (ymax * 1000000).toLong
+                  // "xmin" -> (xmin * 1000000).toLong,
+                  // "ymin" -> (ymin * 1000000).toLong,
+                  // "xmax" -> (xmax * 1000000).toLong,
+                  // "ymax" -> (ymax * 1000000).toLong,
+                  "i" -> i
                 )
 
-                (_from, _to) match {
-                  case (Some(from), Some(to)) =>
-                    val wave = spatioTemporalRangeQuery(
+                val wave = (_from, _to, waveTable) match {
+                  case (Some(from), Some(to), Some(waveTable)) =>
+                    Some(spatioTemporalRangeQuery(
                       waveQuery, waveTable, sftName,
                       "where", xmin, ymin, xmax, ymax,
-                      "when", from, to
-                    )
-                    val mesa = spatioTemporalRangeQuery(
+                      "when", from, to))
+                  case (_, _, Some(waveTable)) =>
+                    Some(spatialRangeQuery(
+                      waveQuery, waveTable, sftName,
+                      "where", xmin, ymin, xmax, ymax))
+                  case _ => None
+                }
+
+                val mesa = (_from, _to, mesaTable) match {
+                  case (Some(from), Some(to), Some(mesaTable)) =>
+                    Some(spatioTemporalRangeQuery(
                       mesaQuery, mesaTable, sftName,
                       "where", xmin, ymin, xmax, ymax,
-                      "when", from, to
-                    )
-                    Map[String, Map[String, Long]](
-                      "info" -> info,
-                      "mesa" -> mesa,
-                      "wave" -> wave
-                    )
-                  case _ =>
-                    val mesa = spatialRangeQuery(
+                      "when", from, to))
+                  case (_, _, Some(mesaTable)) =>
+                    Some(spatialRangeQuery(
                       mesaQuery, mesaTable, sftName,
-                      "where", xmin, ymin, xmax, ymax
-                    )
-                    val wave = spatialRangeQuery(
-                      waveQuery, waveTable, sftName,
-                      "where", xmin, ymin, xmax, ymax
-                    )
-                    Map[String, Map[String, Long]](
-                      "info" -> info,
-                      "wave" -> wave,
-                      "mesa" -> mesa
-                    )
+                      "where", xmin, ymin, xmax, ymax))
+                  case _ => None
+                }
+
+                (mesa, wave) match {
+                  case (Some(mesa), Some(wave)) =>
+                    Map("info" -> info, "mesa" -> mesa, "wave" -> wave)
+                  case (None, Some(wave)) =>
+                    Map("info" -> info, "wave" -> wave)
+                  case (Some(mesa), None) =>
+                    Map("info" -> info, "mesa" -> mesa)
+                  case _ => throw new Exception
                 }
               })
           }

@@ -39,7 +39,7 @@ libraryDependencies ++= {
   val scalazScalaTestV = "0.3.0"
   val akkaCirceV       = "1.8.0"
   val geomesaV         = "1.2.5"
-  val geowaveV         = "0.9.2"
+  val geowaveV         = "0.9.3-SNAPSHOT"
   val geotoolsV        = "14.3"
   val sfcurveV         = "0.2.0"
   val jaiV             = "1.1.3"
@@ -59,7 +59,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-testkit"                 % akkaV       % "test",
     "org.locationtech.geomesa"  % "geomesa-accumulo-datastore" % geomesaV,
     "javax.media"       %  "jai_core"                          % jaiV
-      from "http://download.osgeo.org/webdav/geotools/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar",
+      from "https://s3.amazonaws.com/geowave-geomesa-comparison/jars/jai_core-1.1.3.jar",
     "org.apache.accumulo" % "accumulo-core"                    % accumuloV
       exclude("org.jboss.netty", "netty")
       exclude("org.apache.hadoop", "hadoop-client"),

@@ -1,15 +1,20 @@
 package geotrellis.analysis
 
-import akka.http.scaladsl.server.Directives._
-
-import geotrellis.analysis.status._
 import geotrellis.analysis.geomesa.connection._
 import geotrellis.analysis.geowave.connection._
+import geotrellis.analysis.status._
+
+import akka.http.scaladsl.server.Directives._
+
+import scala.concurrent.duration._
+
 
 object Routes {
 
   val queryRoutes =
-    Query.queryBoth(geowave.Query.query, geomesa.Query.query)
+    withRequestTimeout(60.seconds) {
+      Query.queryBoth(geowave.Query.query, geomesa.Query.query)
+    }
 
   val systemRoutes =
     pathPrefix("system") {
