@@ -22,47 +22,30 @@ object Query
   ) => Int
 
 
-  /**
-    * Perform a spatial range query, return the amount of time and the
-    * number of records.
-    */
-  def spatialRangeQuery(
+  def timedQuery(
     query: QueryFn,
     tableName: String, typeName: String,
-    where: String, xmin: Double, ymin: Double, xmax: Double, ymax: Double
+    where: String, xmin: Double, ymin: Double, xmax: Option[Double], ymax: Option[Double],
+    when: Option[String] = None, fromTime: Option[String] = None, toTime: Option[String] = None
   ) = {
     val before = System.currentTimeMillis
-    val n =
-      query(
-        tableName, typeName,
-        where, List(xmin, ymin), Some(List(xmax, ymax)),
-        None, None, None
-      )
-    val after = System.currentTimeMillis
 
-    Map[String, Long](
-      "time" -> (after - before),
-      "results" -> n
-    )
-  }
-
-  /**
-    * Perform a spatio-temporal range query, return the amount of time
-    * and the number of records.
-    */
-  def spatioTemporalRangeQuery(
-    query: QueryFn,
-    tableName: String, typeName: String,
-    where: String, xmin: Double, ymin: Double, xmax: Double, ymax: Double,
-    when: String, fromTime: String, toTime: String
-  ) = {
-    val before = System.currentTimeMillis
     val n =
-      query(
-        tableName, typeName,
-        where, List(xmin, ymin), Some(List(xmax, ymax)),
-        Some(when), Some(fromTime), Some(toTime)
-      )
+      (xmax, ymax) match {
+        case (Some(xmax), Some(ymax)) =>
+          query(
+            tableName, typeName,
+            where, List(xmin, ymin), Some(List(xmax, ymax)),
+            when, fromTime, toTime
+          )
+        case _ =>
+          query(
+            tableName, typeName,
+            where, List(xmin, ymin), None,
+            when, fromTime, toTime
+          )
+      }
+
     val after = System.currentTimeMillis
 
     Map[String, Long](
@@ -76,8 +59,8 @@ object Query
     */
   def queryBoth(waveQuery: QueryFn, mesaQuery: QueryFn) =
     pathPrefix("rangequeries") {
-      parameters('width, 'n, 'seed, 'mesaTable ?, 'waveTable ?, 'sftName, 'from ?, 'to ?) {
-        (width, n, seed, mesaTable, waveTable, sftName, _from, _to) =>
+      parameters('width ?, 'n, 'seed, 'mesaTable ?, 'waveTable ?, 'sftName, 'from ?, 'to ?) {
+        (width, n, seed, mesaTable, waveTable, sftName, fromTime, toTime) =>
         rng.setSeed(seed.toLong)
         complete {
           Future {
@@ -85,38 +68,34 @@ object Query
               .map({ i =>
                 val xmin = math.max(-180, 360*rng.nextDouble - 180)
                 val ymin = math.max(-90,  180*rng.nextDouble - 90)
-                val xmax = math.min(180,  xmin + width.toDouble)
-                val ymax = math.min(90,   ymin + width.toDouble)
+                val xmax = width.map({ width => math.min(180, xmin + width.toDouble) })
+                val ymax = width.map({ width => math.min(90,  ymin + width.toDouble) })
 
                 val info = Map[String, Long](
-                  // "xmin" -> (xmin * 1000000).toLong,
-                  // "ymin" -> (ymin * 1000000).toLong,
-                  // "xmax" -> (xmax * 1000000).toLong,
-                  // "ymax" -> (ymax * 1000000).toLong,
                   "i" -> i
                 )
 
-                val wave = (_from, _to, waveTable) match {
+                val wave = (fromTime, toTime, waveTable) match {
                   case (Some(from), Some(to), Some(waveTable)) =>
-                    Some(spatioTemporalRangeQuery(
+                    Some(timedQuery(
                       waveQuery, waveTable, sftName,
                       "where", xmin, ymin, xmax, ymax,
-                      "when", from, to))
+                      Some("when"), Some(from), Some(to)))
                   case (_, _, Some(waveTable)) =>
-                    Some(spatialRangeQuery(
+                    Some(timedQuery(
                       waveQuery, waveTable, sftName,
                       "where", xmin, ymin, xmax, ymax))
                   case _ => None
                 }
 
-                val mesa = (_from, _to, mesaTable) match {
+                val mesa = (fromTime, toTime, mesaTable) match {
                   case (Some(from), Some(to), Some(mesaTable)) =>
-                    Some(spatioTemporalRangeQuery(
+                    Some(timedQuery(
                       mesaQuery, mesaTable, sftName,
                       "where", xmin, ymin, xmax, ymax,
-                      "when", from, to))
+                      Some("when"), Some(from), Some(to)))
                   case (_, _, Some(mesaTable)) =>
-                    Some(spatialRangeQuery(
+                    Some(timedQuery(
                       mesaQuery, mesaTable, sftName,
                       "where", xmin, ymin, xmax, ymax))
                   case _ => None
@@ -140,22 +119,22 @@ object Query
   def rangeQuery(query: QueryFn, tableName: String) =
     pathPrefix(Segment) { sftName =>
       pathPrefix("rangequery") {
-        parameters('xmin, 'ymin, 'xmax, 'ymax, 'from ?, 'to ?) { (_xmin, _ymin, _xmax, _ymax, _from, _to) =>
+        parameters('xmin, 'ymin, 'xmax, 'ymax, 'from ?, 'to ?) { (_xmin, _ymin, _xmax, _ymax, fromTime, toTime) =>
           val xmin = _xmin.toDouble
           val ymin = _ymin.toDouble
           val xmax = _xmax.toDouble
           val ymax = _ymax.toDouble
 
-          (_from, _to) match {
+          (fromTime, toTime) match {
             case (Some(from), Some(to)) =>
               complete {
                 Future {
-                  spatioTemporalRangeQuery(
+                  timedQuery(
                     query,
                     tableName,
                     sftName,
-                    "where", xmin, ymin, xmax, ymax,
-                    "when", from, to
+                    "where", xmin, ymin, Some(xmax), Some(ymax),
+                    Some("when"), Some(from), Some(to)
                   )
                 }
               }
@@ -163,11 +142,11 @@ object Query
             case _ =>
               complete {
                 Future {
-                  spatialRangeQuery(
+                  timedQuery(
                     query,
                     tableName,
                     sftName,
-                    "where", xmin, ymin, xmax, ymax
+                    "where", xmin, ymin, Some(xmax), Some(ymax)
                   )
                 }
               }
