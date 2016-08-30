@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
 TABLE=${1}
-N=${2:-"1000"}
+N=${2:-"500"}
 SCHEMA=${3:-"CommonPolygonSimpleFeatureType"}
-SEED=${4:-"0"}
 
 for nugget in 30,0.000000168,1 29,0.000000335,1 28,0.000000671,1 \
                                27,0.000001341,1 26,0.000002682,1 25,0.000005364,1 \
@@ -19,6 +18,7 @@ do
     WIDTH=$(echo $nugget | cut -f2 -d,)
     D=$(echo $nugget | cut -f3 -d,)
     NUM=$(expr $N / $D)
+    SEED=${4:-$BITS}
 
-    curl "http://localhost:7070/rangequeries?width=${WIDTH}&n=${NUM}&seed=${SEED}&waveTable=geowave.${TABLE}&mesaTable=geomesa.${TABLE}&sftName=${SCHEMA}&from=1970-01-03T00:00:00.000Z&to=1970-01-04T00:00:00.000Z" > ${TABLE}.${BITS}.json
+    curl "http://localhost:7070/queries?width=${WIDTH}&n=${NUM}&seed=${SEED}&waveTable=geowave.${TABLE}&mesaTable=geomesa.${TABLE}&sftName=${SCHEMA}&from=1970-01-03T00:00:00.000Z&to=1970-01-04T00:00:00.000Z" > ${TABLE}.${BITS}.json
 done
