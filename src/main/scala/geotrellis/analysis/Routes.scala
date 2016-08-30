@@ -46,8 +46,7 @@ object Routes {
               geomesa.SimpleFeatureTypes.detail(tableName, sftName)
             }
           }
-        } ~
-        Query.rangeQuery(geomesa.Query.query, tableName)
+        }
       }
     }
 
@@ -70,8 +69,7 @@ object Routes {
               geowave.SimpleFeatureTypes.detail(tableName, sftName)
             }
           }
-        } ~
-        Query.rangeQuery(geowave.Query.query, tableName)
+        }
       }
     }
 

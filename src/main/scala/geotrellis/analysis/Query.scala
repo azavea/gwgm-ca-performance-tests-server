@@ -159,43 +159,4 @@ object Query
         }
       }
     }
-
-  def rangeQuery(query: QueryFn, tableName: String) =
-    pathPrefix(Segment) { sftName =>
-      pathPrefix("rangequery") {
-        parameters('xmin, 'ymin, 'xmax, 'ymax, 'from ?, 'to ?) { (_xmin, _ymin, _xmax, _ymax, fromTime, toTime) =>
-          val xmin = _xmin.toDouble
-          val ymin = _ymin.toDouble
-          val xmax = _xmax.toDouble
-          val ymax = _ymax.toDouble
-
-          (fromTime, toTime) match {
-            case (Some(from), Some(to)) =>
-              complete {
-                Future {
-                  timedQuery(
-                    query,
-                    tableName,
-                    sftName,
-                    "where", xmin, ymin, Some(xmax), Some(ymax),
-                    Some("when"), Some(from), Some(to)
-                  )
-                }
-              }
-
-            case _ =>
-              complete {
-                Future {
-                  timedQuery(
-                    query,
-                    tableName,
-                    sftName,
-                    "where", xmin, ymin, Some(xmax), Some(ymax)
-                  )
-                }
-              }
-          }
-        }
-      }
-    }
 }
