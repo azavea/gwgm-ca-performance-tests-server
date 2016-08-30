@@ -22,6 +22,21 @@ object Query
   ) => Int
 
 
+  /**
+    * Perform a timed query.
+    *
+    * @param query      The function used to query either GeoWave or GeoMesa
+    * @param tableName  The name of the GeoMesa table or GeoWave namespace to query
+    * @param typeName   The SimpleFeatureTypeName (schema) to query
+    * @param where      The name of the field in the SimpleFeatureType that contains spatial data
+    * @param xmin       The x-coordinate of the query point, or of the lower-left corner of the query box
+    * @param ymin       The y-coordinate of the query point, or of the lower-left corner of the query box
+    * @param xmax       The x-coordinate of the upper-right corner of the query box
+    * @param ymax       The y-coordinate of the upper-right corner of the query box
+    * @param when       The name of the field in the SimpleFeatureType that contans the temporal data
+    * @param fromTime   The start time of the temporal range
+    * @pram  toTime     The finish time of the temporal range
+    */
   def timedQuery(
     query: QueryFn,
     tableName: String, typeName: String,
@@ -55,10 +70,39 @@ object Query
   }
 
   /**
-    * Query both GeoWave and GeoMesa simultaneously.
+    * Query GeoWave and/or GeoMesa.
+    *
+    * @param waveQuery The function used for performing GeoWave queries
+    * @param mesaQuery The function used for performing GeoMesa queries
     */
   def queryBoth(waveQuery: QueryFn, mesaQuery: QueryFn) =
-    pathPrefix("rangequeries") {
+    pathPrefix("queries") {
+      /*
+       * The optional parameter "width" gives the width and height of
+       * the range query boxes to generate.  If this parameter is not
+       * given, then point queries are done.
+       *
+       * The parameter "n" is the number of queries to perform against
+       * GeoMesa and/or against GeoWave.
+       *
+       * The parameter "seed" is the RNG seed to use for generating
+       * random queries.
+       *
+       * The optional parameter "mesaTable" gives the name of the
+       * GeoMesa table (the Accumulo table name prefixes) to query.
+       * If this parameter is not given, then GeoMesa is not queried.
+       *
+       * The optional parameter "waveTable" gives the name of the
+       * GeoWave namespace (the Accumulo table name prefixes) to
+       * query.  If this parameter is not given, then GeoWave is not
+       * queried.
+       *
+       * The "sftName" parameter gives the SimpleFeatureTypeName
+       * (schema) to look for.
+       *
+       * The parameters "from" and "to" provide the temporal range in
+       * which to query.
+       */
       parameters('width ?, 'n, 'seed, 'mesaTable ?, 'waveTable ?, 'sftName, 'from ?, 'to ?) {
         (width, n, seed, mesaTable, waveTable, sftName, fromTime, toTime) =>
         rng.setSeed(seed.toLong)
