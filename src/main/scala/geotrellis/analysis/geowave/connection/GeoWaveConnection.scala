@@ -15,10 +15,12 @@ object GeoWaveConnection {
   import ArbitraryTypeReader._
 
   private val config = ConfigFactory.load()
-  protected val geowaveConfig = config.as[GeoWaveConnectionConfig]("geowave")
+  protected lazy val geowaveConfig = config.as[GeoWaveConnectionConfig]("geowave")
 
   private val additionalAccumuloOpts = new AccumuloOptions
   additionalAccumuloOpts.setUseAltIndex(true)
+
+  lazy val clusterId = geowaveConfig.cluster
 
   def accumuloOpts(gwNamespace: String) = {
     val opts = new AccumuloRequiredOptions

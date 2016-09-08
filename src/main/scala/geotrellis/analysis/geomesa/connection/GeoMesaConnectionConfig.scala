@@ -10,7 +10,8 @@ case class GeoMesaConnectionConfig(
   user: String,
   password: String,
   instance: String,
-  zookeepers: String
+  zookeepers: String,
+  cluster: String
 ) {
   def toParamsMap(tableName: String) = {
     println(s"Creating GeoMesa connection with: table->${tableName}, user->${this.user}, password->${this.password}, instance->${this.instance}, and zk->${this.zookeepers}")

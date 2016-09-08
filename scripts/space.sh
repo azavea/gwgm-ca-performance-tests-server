@@ -2,7 +2,7 @@
 
 TABLE=${1}
 N=${2:-"1000"}
-SCHEMA=${3:-"CommonPolygonSimpleFeatureType"}
+SCHEMA=${3:-"CommonPointSimpleFeatureType"}
 
 set -x
 for nugget in 30,0.000000168,1 29,0.000000335,1 28,0.000000671,1 \
@@ -21,5 +21,8 @@ do
     NUM=$(expr $N / $D)
     SEED=${4:-$BITS}
 
-    curl "http://localhost:7070/queries?width=${WIDTH}&n=${NUM}&seed=${SEED}&waveTable=geowave.${TABLE}&mesaTable=geomesa.${TABLE}&sftName=${SCHEMA}" > ${TABLE}.${BITS}.json
+#    curl "http://localhost:7070/queries?width=${WIDTH}&n=${NUM}&seed=${SEED}&waveTable=geowave.${TABLE}&mesaTable=geomesa.${TABLE}&sftName=${SCHEMA}" > ${TABLE}.${BITS}.json
+#    curl "http://localhost:7070/queries?width=${WIDTH}&n=${NUM}&seed=${SEED}&waveTable=geowave.${TABLE}&sftName=${SCHEMA}" > ${TABLE}.${BITS}.json
+#    curl "http://tf-lb-7au47rbvgrhrpbxmjjwgffu6we-1681507611.us-east-1.elb.amazonaws.com/queries?width=${WIDTH}&n=${NUM}&seed=${SEED}&mesaTable=geomesa.${TABLE}&sftName=${SCHEMA}" > ${TABLE}.${BITS}.json
+curl "http://tf-lb-201609062152422959468646jd-275969445.us-east-1.elb.amazonaws.com/queries?width=${WIDTH}&n=${NUM}&seed=${SEED}&mesaTable=geomesa.${TABLE}&sftName=${SCHEMA}" > ${TABLE}.${BITS}.json
 done

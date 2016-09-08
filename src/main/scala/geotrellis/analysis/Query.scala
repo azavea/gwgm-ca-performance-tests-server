@@ -1,11 +1,16 @@
 package geotrellis.analysis
 
+import geotrellis.analysis.results._
+
 import akka.http.scaladsl.server.Directives._
 import scala.concurrent.Future
 
+import de.heikoseeberger.akkahttpcirce._
+import io.circe.generic.auto._
 
 object Query
     extends BaseService
+    with CirceSupport
     with AkkaSystem.LoggerExecutor {
 
   val rng = new scala.util.Random
@@ -39,10 +44,11 @@ object Query
     */
   def timedQuery(
     query: QueryFn,
+    clusterId: String,
     tableName: String, typeName: String,
     where: String, xmin: Double, ymin: Double, xmax: Option[Double], ymax: Option[Double],
     when: Option[String] = None, fromTime: Option[String] = None, toTime: Option[String] = None
-  ) = {
+  ): TestResult = {
     val before = System.currentTimeMillis
 
     val n =
@@ -63,10 +69,7 @@ object Query
 
     val after = System.currentTimeMillis
 
-    Map[String, Long](
-      "time" -> (after - before),
-      "results" -> n
-    )
+    TestResult(clusterId, before, after, n.toString)
   }
 
   /**
@@ -110,8 +113,8 @@ object Query
           Future {
             (0 until n.toInt)
               .map({ i =>
-                val xmin = math.max(-180, 360*rng.nextDouble - 180)
-                val ymin = math.max(-90,  180*rng.nextDouble - 90)
+                val xmin = math.max(-180, 360 * rng.nextDouble - 180)
+                val ymin = math.max(-90,  180 * rng.nextDouble - 90)
                 val xmax = width.map({ width => math.min(180, xmin + width.toDouble) })
                 val ymax = width.map({ width => math.min(90,  ymin + width.toDouble) })
 
@@ -121,39 +124,77 @@ object Query
 
                 val wave = (fromTime, toTime, waveTable) match {
                   case (Some(from), Some(to), Some(waveTable)) =>
-                    Some(timedQuery(
-                      waveQuery, waveTable, sftName,
-                      "where", xmin, ymin, xmax, ymax,
-                      Some("when"), Some(from), Some(to)))
+                    Some(
+                      timedQuery(
+                        waveQuery,
+                        geowave.connection.GeoWaveConnection.clusterId,
+                        waveTable,
+                        sftName,
+                        "where",
+                        xmin,
+                        ymin,
+                        xmax,
+                        ymax,
+                        Some("when"),
+                        Some(from),
+                        Some(to)
+                      )
+                    )
                   case (_, _, Some(waveTable)) =>
-                    Some(timedQuery(
-                      waveQuery, waveTable, sftName,
-                      "where", xmin, ymin, xmax, ymax))
+                    Some(
+                      timedQuery(
+                        waveQuery,
+                        geowave.connection.GeoWaveConnection.clusterId,
+                        waveTable,
+                        sftName,
+                        "where",
+                        xmin,
+                        ymin,
+                        xmax,
+                        ymax
+                      )
+                    )
                   case _ => None
                 }
 
                 val mesa = (fromTime, toTime, mesaTable) match {
                   case (Some(from), Some(to), Some(mesaTable)) =>
-                    Some(timedQuery(
-                      mesaQuery, mesaTable, sftName,
-                      "where", xmin, ymin, xmax, ymax,
-                      Some("when"), Some(from), Some(to)))
+                    Some(
+                      timedQuery(
+                        mesaQuery,
+                        geomesa.connection.GeoMesaConnection.clusterId,
+                        mesaTable,
+                        sftName,
+                        "where",
+                        xmin,
+                        ymin,
+                        xmax,
+                        ymax,
+                        Some("when"),
+                        Some(from),
+                        Some(to)
+                      )
+                    )
                   case (_, _, Some(mesaTable)) =>
-                    Some(timedQuery(
-                      mesaQuery, mesaTable, sftName,
-                      "where", xmin, ymin, xmax, ymax))
+                    Some(
+                      timedQuery(
+                        mesaQuery,
+                        geomesa.connection.GeoMesaConnection.clusterId,
+                        mesaTable,
+                        sftName,
+                        "where",
+                        xmin,
+                        ymin,
+                        xmax,
+                        ymax
+                      )
+                    )
                   case _ => None
                 }
 
-                (mesa, wave) match {
-                  case (Some(mesa), Some(wave)) =>
-                    Map("info" -> info, "mesa" -> mesa, "wave" -> wave)
-                  case (None, Some(wave)) =>
-                    Map("info" -> info, "wave" -> wave)
-                  case (Some(mesa), None) =>
-                    Map("info" -> info, "mesa" -> mesa)
-                  case _ => throw new Exception
-                }
+                val result = RunResult("test name", mesa, wave)
+                DynamoDB.saveResult(result)
+                result
               })
           }
         }

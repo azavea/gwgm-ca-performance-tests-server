@@ -20,5 +20,7 @@ do
     NUM=$(expr $N / $D)
     SEED=${4:-$BITS}
 
-    curl "http://localhost:7070/queries?width=${WIDTH}&n=${NUM}&seed=${SEED}&waveTable=geowave.${TABLE}&mesaTable=geomesa.${TABLE}&sftName=${SCHEMA}&from=1970-01-03T00:00:00.000Z&to=1970-01-04T00:00:00.000Z" > ${TABLE}.${BITS}.json
+    # curl "http://localhost:7070/queries?width=${WIDTH}&n=${NUM}&seed=${SEED}&waveTable=geowave.${TABLE}&mesaTable=geomesa.${TABLE}&sftName=${SCHEMA}&from=1970-01-03T00:00:00.000Z&to=1970-01-04T00:00:00.000Z" > ${TABLE}.${BITS}.json
+
+    curl "http://localhost:7070/queries?width=${WIDTH}&n=${NUM}&seed=${SEED}&waveTable=geowave.${TABLE}&sftName=${SCHEMA}&from=1970-01-03T00:00:00.000Z&to=1970-01-04T00:00:00.000Z" > ${TABLE}.${BITS}.json
 done
