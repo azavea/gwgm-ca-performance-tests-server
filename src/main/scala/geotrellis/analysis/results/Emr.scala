@@ -40,7 +40,6 @@ object Emr {
               emr.listClusters()
             }
           }
-          //r.getClusters ++ (if(r.
           val newMarker = r.getMarker
           println(newMarker)
           r.getClusters.asScala ++ (if(newMarker != null && !newMarker.isEmpty) { f(newMarker) } else { Seq() })
@@ -55,19 +54,6 @@ object Emr {
       val clusterId = c.getId
       val clusterName = c.getName
       println(s"Reading values for $clusterId - $clusterName")
-
-      // val lir = new ListInstancesRequest()
-      // lir.setClusterId(c.getId)
-      // lir.setInstanceGroupTypes(Seq("MASTER").asJava)
-      // val masterInstances = withRetry { emr.listInstances(lir).getInstances.asScala }
-      // if(masterInstances.isEmpty) None
-      // else {
-      //   val master = masterInstances.head.getPublicDnsName()
-        // lir.setInstanceGroupTypes(Seq("CORE", "TASK").asJava)
-        // val workers = emr.listInstances(lir)
-        // println(master)
-        // val size = workers.getInstances.size
-        // val workerId = workers.getInstances.asScala.head.getEc2InstanceId
 
       val lig = new ListInstanceGroupsRequest()
       lig.setClusterId(clusterId)

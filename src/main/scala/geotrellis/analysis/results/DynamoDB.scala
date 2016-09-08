@@ -35,6 +35,7 @@ object DynamoDB {
     a
   }
 
+  // For testing purposes
   // def main(args: Array[String]): Unit = {
   //   val table = db.describeTable(TABLE_NAME)
   //   println(table)
