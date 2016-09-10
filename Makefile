@@ -9,10 +9,12 @@ clean:
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
-assemble: ${ASSEMBLY_JAR} $(call rwildcard, src, *.scala) build.sbt
+${ASSEMBLY_JAR}: $(call rwildcard, src, *.scala) build.sbt
 	./sbt assembly
 
-build: Dockerfile assemble
+assembly: ${ASSEMBLY_JAR}
+
+build: Dockerfile assembly
 	docker build -t ${IMG}:rob	.
 
 publish: build
