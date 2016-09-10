@@ -8,6 +8,7 @@ import org.geotools.data.{ Query => GeoToolsQuery }
 import org.geotools.filter.text.cql2.CQL
 import org.geotools.filter.text.cql2.CQLException
 import org.locationtech.geomesa.accumulo.data.AccumuloDataStore
+import org.locationtech.geomesa.accumulo.index.QueryHints.EXACT_COUNT
 import org.opengis.filter.Filter
 
 
@@ -36,7 +37,8 @@ object Query {
     upperRight: Option[Seq[Double]],
     when: Option[String],
     fromTime: Option[String],
-    toTime: Option[String]
+    toTime: Option[String],
+    tserverCount: Boolean
   ): Int = {
 
     val ds = GeoMesaConnection.dataStore(tableName)
@@ -53,20 +55,25 @@ object Query {
         s"AND ($when TEQUALS $fromTime)"
       case _ => ""
     }
-    // println(s"MESA ${spatial + temporal}")
 
     val filter = CQL.toFilter(spatial + temporal)
     val query = new GeoToolsQuery(typeName, filter)
     val fs = ds.getFeatureSource(typeName)
-    val itr = fs.getFeatures(query).features
 
-    var n = 0
-    while (itr.hasNext) {
-      val feature = itr.next
-      // println(s"MESA ${feature.getProperties}")
-      n += 1
+    if (tserverCount) { // https://gitter.im/locationtech/geomesa?at=57c879ebccfcf7147cafe417
+      query.getHints.put(EXACT_COUNT, true)
+      fs.getCount(query)
     }
-    n // return value
+    else {
+      val itr = fs.getFeatures(query).features
+      var n = 0
+      while (itr.hasNext) {
+        val feature = itr.next
+        // println(s"MESA ${feature.getProperties}")
+        n += 1
+      }
+      n // return value
+    }
   }
 
 }

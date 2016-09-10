@@ -7,6 +7,7 @@ import com.vividsolutions.jts.geom._
 import com.vividsolutions.jts.geom.GeometryFactory
 import mil.nga.giat.geowave.adapter.vector.FeatureDataAdapter
 import mil.nga.giat.geowave.core.geotime.store.query._
+import mil.nga.giat.geowave.core.store.query.aggregate._
 import mil.nga.giat.geowave.core.store.query.{Query => GeoWaveQuery, QueryOptions}
 import org.opengis.feature.simple._
 
@@ -26,16 +27,22 @@ object Query {
     upperRight: Option[Seq[Double]],
     when: Option[String],
     fromTime: Option[String],
-    toTime: Option[String]
+    toTime: Option[String],
+    tserverCount: Boolean
   ): Int = {
-    /* Get the DataStore, the DataAdapter, and the QueryOptions */
+    /* Get DataStore, DataAdapter */
     val ds = GeoWaveConnection.dataStore(gwNamespace)
     val adapter = GeoWaveConnection.adapterStore(gwNamespace)
       .getAdapters
       .map(_.asInstanceOf[FeatureDataAdapter])
       .filter(_.getType.getTypeName == typeName)
       .next
+
+    /* Create the QueryOptions */
     val queryOptions = new QueryOptions(adapter)
+    if (tserverCount) { // https://gitter.im/ngageoint/geowave?at=57c87c20861faa7f07ad31b9
+      queryOptions.setAggregation(new CountAggregation, adapter)
+    }
 
     /* Get the Query Geometry, either a box or a point */
     val geom = upperRight match {
@@ -46,7 +53,6 @@ object Query {
         val coordinate = new Coordinate(lowerLeft(0), lowerLeft(1))
         geometryFactory.createPoint(coordinate)
     }
-    // println(s"WAVE $geom")
 
     /* Create the Query */
     val query: GeoWaveQuery = (when, fromTime, toTime) match {
@@ -61,14 +67,25 @@ object Query {
         new SpatialQuery(geom)
     }
 
-    var n = 0
     val itr = ds.query(queryOptions, query)
-    while (itr.hasNext) {
-      val feature: SimpleFeature = itr.next
-      // println(s"WAVE ${feature}")
-      n += 1
+    if (tserverCount) {
+      var n: Long = 0
+      while (itr.hasNext) {
+        val countResult = (itr.next).asInstanceOf[CountResult]
+        n += countResult.getCount
+      }
+
+      itr.close; n.toInt
     }
-    itr.close; n // return value
+    else {
+      var n = 0
+      while (itr.hasNext) {
+        val feature: SimpleFeature = itr.next
+        // println(s"WAVE ${feature}")
+        n += 1
+      }
+      itr.close; n // return value
+    }
   }
 
 }
