@@ -13,7 +13,9 @@ object GeoMesaConnection {
   import scala.collection.JavaConversions._
 
   private val config = ConfigFactory.load()
-  protected val geomesaConfig = config.as[GeoMesaConnectionConfig]("geomesa")
+  protected lazy val geomesaConfig = config.as[GeoMesaConnectionConfig]("geomesa")
+
+  lazy val clusterId = geomesaConfig.cluster
 
   def dataStore(tableName: String): AccumuloDataStore = {
     val dsParams = geomesaConfig.toParamsMap(tableName)

@@ -46,6 +46,7 @@ libraryDependencies ++= {
   val accumuloV        = "1.7.1"
 
   Seq(
+    "com.amazonaws" % "aws-java-sdk" % "1.11.31",
     "com.typesafe.akka" %% "akka-http-core"                    % akkaV,
     "com.typesafe.akka" %% "akka-http-experimental"            % akkaV,
     "com.iheart"        %% "ficus"                             % ficusV,
@@ -78,19 +79,19 @@ libraryDependencies ++= {
     "org.geoserver" % "gs-wms" % "2.8.2"
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
         ExclusionRule(organization = "javax.servlet")),
-    "org.geotools" % "gt-coverage" % geotoolsV % "provided"
+    "org.geotools" % "gt-coverage" % geotoolsV
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
         ExclusionRule(organization = "javax.servlet")),
-    "org.geotools" % "gt-epsg-hsql" % geotoolsV % "provided"
+    "org.geotools" % "gt-epsg-hsql" % geotoolsV
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
         ExclusionRule(organization = "javax.servlet")),
-    "org.geotools" % "gt-geotiff" % geotoolsV % "provided"
+    "org.geotools" % "gt-geotiff" % geotoolsV
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
         ExclusionRule(organization = "javax.servlet")),
-    "org.geotools" % "gt-main" % geotoolsV % "provided"
+    "org.geotools" % "gt-main" % geotoolsV
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
         ExclusionRule(organization = "javax.servlet")),
-    "org.geotools" % "gt-referencing" % geotoolsV % "provided"
+    "org.geotools" % "gt-referencing" % geotoolsV
       excludeAll(ExclusionRule(organization = "org.mortbay.jetty"),
         ExclusionRule(organization = "javax.servlet"))
   )
@@ -119,5 +120,6 @@ assemblyMergeStrategy in assembly := {
   case "META-INF/ECLIPSEF.SF" => MergeStrategy.discard
   case "META-INF/BCKEY.SF" => MergeStrategy.discard
   case "META-INF/BCKEY.DSA" => MergeStrategy.discard
+  case x if x.startsWith("META-INF/services") => MergeStrategy.concat
   case _ => MergeStrategy.first
 }
